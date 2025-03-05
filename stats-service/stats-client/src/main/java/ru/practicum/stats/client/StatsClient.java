@@ -1,8 +1,10 @@
 package ru.practicum.stats.client;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import ru.practicum.stats.dto.HitDto;
@@ -10,12 +12,14 @@ import ru.practicum.stats.dto.StatsDto;
 
 import java.util.List;
 
+@Service
 public class StatsClient {
     private final RestTemplate restTemplate;
-    private final String serverUrl = "http://localhost:9090";
+    private final String serverUrl;
 
-    public StatsClient() {
-        this.restTemplate = new RestTemplate();
+    public StatsClient(RestTemplate restTemplate, @Value("${stats-service.uri}") String serverUrl) {
+        this.restTemplate = restTemplate;
+        this.serverUrl = serverUrl;
     }
 
     public void saveHit(HitDto hitDto) {
@@ -38,7 +42,7 @@ public class StatsClient {
                 builder.toUriString(),
                 HttpMethod.GET,
                 null,
-                new ParameterizedTypeReference<List<StatsDto>>() {}
+                new ParameterizedTypeReference<>() {}
         );
         return response.getBody();
     }
